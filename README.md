@@ -47,3 +47,5 @@ dyn_conv = dynfilt_layers.Conv2D(
 # convolve with dynfilt
 dyn_conv(X, kernel_values)
 ```
+
+WARNING: this Conv2D layer does not explicitly apply a bias or an activation function to the output of each channel. If you need to apply an activation function and/or biases, do not forget to add those!
