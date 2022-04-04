@@ -34,8 +34,5 @@ dyn_conv = dynfilt_layers.Conv2D(
 				)
 
 # convolve with dynfilt
-dyn_conv(
-	X, 
-	kernel_values
-	)
+dyn_conv(X, kernel_values)
 ```
