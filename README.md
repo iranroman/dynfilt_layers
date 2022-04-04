@@ -2,7 +2,18 @@
 
 Apply a different kernel (or matrix operation) to each datapoint in a mini batch. 
 
+## How to install
+
+```
+git clone https://github.com/iranroman/dynfilt_layers.git
+
+cd dynfilt_layers
+
+pip install -e .
+```
+
 ## Example with dynfilt_layers.Conv2D
+
 ```
 import dynfilt_layers
 import numpy as np
