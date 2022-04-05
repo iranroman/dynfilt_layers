@@ -45,7 +45,7 @@ class Conv2D(tf.keras.layers.Layer):
         K = tf.transpose(kernel, [1, 2, 0, 3, 4])
 
         # reshape the kernel
-        K = tf.reshape(K, [k_height, k_width, nchans_in * batch_size, nchans_out])
+        K = tf.reshape(K, [k_height, k_width, -1, nchans_out])
 
         #######################
         # input preprocessing #
@@ -58,7 +58,7 @@ class Conv2D(tf.keras.layers.Layer):
         X = tf.transpose(X, [1, 2, 0, 3])  # shape (H, W, batch_size, nchans_in)
 
         # reshape the input
-        X = tf.reshape(X, [1, H, W, batch_size * nchans_in])
+        X = tf.reshape(X, [1, H, W, -1])
 
         ###############################
         # do a depth-wise convolution #
@@ -71,11 +71,11 @@ class Conv2D(tf.keras.layers.Layer):
         # reshape to have the number of output channels last #
         ######################################################
         if self.padding == "SAME":
-            out = tf.reshape(out, [H, W, batch_size, nchans_in, nchans_out])
+            out = tf.reshape(out, [H, W, -1, nchans_in, nchans_out])
         if self.padding == "VALID":
             out = tf.reshape(
                 out,
-                [H - k_height + 1, W - k_width + 1, batch_size, nchans_in, nchans_out],
+                [H - k_height + 1, W - k_width + 1, -1, nchans_in, nchans_out],
             )
 
         #######################################################
