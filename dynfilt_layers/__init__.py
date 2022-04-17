@@ -29,6 +29,8 @@ class Conv2D(tf.keras.layers.Layer):
     """
 
     def __init__(self, padding="VALID"):
+        if padding not in ['VALID', 'valid', 'SAME', 'same']:
+            raise ValueError('padding should be "VALID" or "SAME"')
         super(Conv2D, self).__init__()
         self.padding = padding
 
@@ -45,7 +47,13 @@ class Conv2D(tf.keras.layers.Layer):
         K = tf.transpose(kernel, [1, 2, 0, 3, 4])
 
         # reshape the kernel
-        K = tf.reshape(K, [k_height, k_width, -1, nchans_out])
+        if batch_size == None:
+            K = tf.reshape(K, [k_height, k_width, -1, nchans_out])
+        elif nchans_out == None:
+            K = tf.reshape(K, [k_height, k_width, nchans_in*batch_size, -1])
+        else:
+            K = tf.reshape(K, [k_height, k_width, nchans_in*batch_size, nchans_out])
+
 
         #######################
         # input preprocessing #
@@ -70,13 +78,30 @@ class Conv2D(tf.keras.layers.Layer):
         ######################################################
         # reshape to have the number of output channels last #
         ######################################################
-        if self.padding == "SAME":
-            out = tf.reshape(out, [H, W, -1, nchans_in, nchans_out])
-        if self.padding == "VALID":
-            out = tf.reshape(
-                out,
-                [H - k_height + 1, W - k_width + 1, -1, nchans_in, nchans_out],
-            )
+        if self.padding == "SAME" or self.padding == "same":
+            if batch_size == None:
+                out = tf.reshape(out, [H, W, -1, nchans_in, nchans_out])
+            elif nchans_out == None:
+                out = tf.reshape(out, [H, W, batch_size, nchans_in, -1])
+            else:
+                out = tf.reshape(out, [H, W, batch_size, nchans_in, nchans_out])
+        elif self.padding == "VALID" or self.padding == "valid":
+            if batch_size == None:
+                out = tf.reshape(
+                    out,
+                    [H - k_height + 1, W - k_width + 1, -1, nchans_in, nchans_out],
+                )
+            elif nchans_out == None:
+                out = tf.reshape(
+                    out,
+                    [H - k_height + 1, W - k_width + 1, batch_size, nchans_in, -1],
+                )
+            else:
+                out = tf.reshape(
+                    out,
+                    [H - k_height + 1, W - k_width + 1, batch_size, nchans_in, nchans_out],
+                )
+
 
         #######################################################
         # transpose and sum along the input channel dimension #
